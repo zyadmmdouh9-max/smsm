@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menna, a date with me?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#2b1030; --wine:#5a1a43; --rose:#e8557a; --blush:#ffd9e2; --petal:#fff3f5; --gold:#f1c27d;
+  --ink:#3a1a33; --muted:#8b6479;
+}
+*{box-sizing:border-box;margin:0}
+html,body{min-height:100%}
+body{
+  font-family:'DM Sans',system-ui,sans-serif; color:var(--ink);
+  background:radial-gradient(1200px 700px at 15% -10%,#7a2457 0%,transparent 60%),
+             radial-gradient(900px 600px at 100% 100%,#a53a63 0%,transparent 55%),var(--plum);
+  background-attachment:fixed; padding:32px 16px 56px;
+}
+.wrap{max-width:560px;margin:0 auto}
+header{text-align:center;color:var(--petal);padding:20px 8px 28px}
+header h1{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:600;font-size:clamp(2.6rem,9vw,3.8rem);line-height:1.05}
+header p{margin-top:14px;font-size:1.05rem;color:var(--blush);max-width:34ch;margin-inline:auto;line-height:1.5}
+.heart{display:inline-block;color:var(--rose);animation:beat 1.6s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.card{background:var(--petal);border-radius:22px;padding:24px 22px;margin-bottom:16px;box-shadow:0 18px 40px rgba(20,4,24,.35)}
+.card h2{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.6rem;font-weight:600;color:var(--wine);margin-bottom:4px}
+.card .hint{color:var(--muted);font-size:.92rem;margin-bottom:16px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{border:2px solid var(--blush);background:#fff;border-radius:18px;padding:18px 10px;font:inherit;font-weight:600;font-size:1.05rem;color:var(--ink);cursor:pointer;transition:.18s}
+.choice .em{display:block;font-size:2rem;margin-bottom:6px}
+.choice:hover{border-color:var(--rose)}
+.choice[aria-pressed="true"]{background:var(--rose);border-color:var(--rose);color:#fff;transform:translateY(-2px)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-head strong{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.35rem;color:var(--wine)}
+.cal-head span{font-size:.85rem;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.dow{font-size:.75rem;font-weight:600;color:var(--muted);padding:4px 0}
+.day{aspect-ratio:1;border:0;border-radius:50%;background:#fff;font:inherit;font-weight:500;color:var(--ink);cursor:pointer;transition:.15s}
+.day:hover:not(:disabled){background:var(--blush)}
+.day:disabled{background:transparent;color:#cdb5c0;cursor:default;text-decoration:line-through}
+.day.selected{background:var(--rose);color:#fff;font-weight:700}
+.day.busy{background:#fff;color:#b04a68}
+.empty{visibility:hidden}
+.notice{display:none;margin-top:14px;padding:12px 14px;border-radius:14px;background:#ffe3ea;color:#8c2346;font-weight:500;line-height:1.45}
+.notice.show{display:block;animation:pop .25s ease}
+@keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+.times{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.time{border:2px solid var(--blush);background:#fff;border-radius:14px;padding:11px 4px;font:inherit;font-weight:600;color:var(--ink);cursor:pointer;transition:.15s}
+.time:hover{border-color:var(--rose)}
+.time[aria-pressed="true"]{background:var(--rose);border-color:var(--rose);color:#fff}
+.summary{font-size:1rem;line-height:1.7;color:var(--ink)}
+.summary b{color:var(--wine)}
+.send{width:100%;margin-top:16px;border:0;border-radius:16px;padding:16px;font:inherit;font-weight:600;font-size:1.08rem;color:#fff;background:linear-gradient(135deg,#e8557a,#c2386a);cursor:pointer;box-shadow:0 10px 24px rgba(232,85,122,.45);transition:.18s}
+.send:disabled{background:#d9c3cd;box-shadow:none;cursor:not-allowed}
+.send:not(:disabled):hover{transform:translateY(-2px)}
+.thanks{display:none;text-align:center;color:var(--petal);padding:10px 8px}
+.thanks.show{display:block;animation:pop .4s ease}
+.thanks h2{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:2.2rem;margin-bottom:8px}
+.intro{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--petal);padding:20px 8px}
+.intro h1{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:600;font-size:clamp(2.4rem,10vw,3.6rem);line-height:1.08}
+.intro p{margin-top:14px;color:var(--blush);font-size:1.05rem;min-height:1.6em}
+.bigheart{font-size:3.4rem;margin-bottom:10px}
+.intro-btns{display:flex;gap:18px;margin-top:34px;align-items:center;justify-content:center}
+.yes,.no{font:inherit;font-weight:600;font-size:1.15rem;border:0;border-radius:16px;padding:15px 34px;cursor:pointer}
+.yes{background:linear-gradient(135deg,#e8557a,#c2386a);color:#fff;box-shadow:0 10px 24px rgba(232,85,122,.45);transition:transform .2s}
+.no{background:var(--petal);color:var(--wine);transition:left .25s ease,top .25s ease;z-index:10;touch-action:none}
+[hidden]{display:none!important}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="intro" class="intro">
+    <div class="bigheart heart">♥</div>
+    <h1>Menna, will you go on a date with me?</h1>
+    <p id="introNote">I promise it will be a lovely one.</p>
+    <div class="intro-btns">
+      <button class="yes" id="yes">Yes 💖</button>
+      <button class="no" id="no">No</button>
+    </div>
+  </div>
+  <div id="main" hidden>
+  <header>
+    <h1>Great! Let's plan it <span class="heart">♥</span></h1>
+    <p>Pick the place, the day and the time. I'll make sure it's perfect.</p>
+  </header>
+
+  <section class="card">
+    <h2>Where should we go?</h2>
+    <p class="hint">Choose one</p>
+    <div class="choices" id="places">
+      <button class="choice" data-v="cafe"><span class="em">☕</span>Café</button>
+      <button class="choice" data-v="restaurant"><span class="em">🍽️</span>Restaurant</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Pick a day</h2>
+    <p class="hint">Any day in November that works for you</p>
+    <div class="cal-head"><strong>November 2026</strong><span id="dayLabel"></span></div>
+    <div class="grid" id="cal"></div>
+    <div class="notice" id="busyNote" role="alert">Zyad isn't free on that day 💔 Please pick another one!</div>
+  </section>
+
+  <section class="card">
+    <h2>What time?</h2>
+    <p class="hint">Choose the hour you like best</p>
+    <div class="times" id="times"></div>
+  </section>
+
+  <section class="card">
+    <h2>Our plan</h2>
+    <p class="summary" id="summary">Pick a place, a day and a time to see your plan.</p>
+    <button class="send" id="send" disabled>Send the details 💌</button>
+  </section>
+
+  <div class="thanks" id="thanks">
+    <h2>Can't wait to see you ♥</h2>
+    <p>WhatsApp should have opened. Just press send there.</p>
+  </div>
+  </div>
+</div>
+
+<script>
+// ====== INTRO ======
+const noBtn=document.getElementById('no'), yesBtn=document.getElementById('yes');
+const lines=["Are you sure? 🥺","Try again 😉","The button is shy 🙈","Nope, not that one 😄","Just press Yes 💖","Too slow! 😜","Please? 🥹"];
+let dodges=0;
+function dodge(e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  dodges++;
+  const w=noBtn.offsetWidth, h=noBtn.offsetHeight, m=12;
+  noBtn.style.position='fixed';
+  const x=m+Math.random()*(window.innerWidth-w-2*m);
+  const y=m+Math.random()*(window.innerHeight-h-2*m);
+  noBtn.style.left=x+'px'; noBtn.style.top=y+'px';
+  document.getElementById('introNote').textContent=lines[dodges%lines.length];
+  yesBtn.style.transform='scale('+Math.min(1+dodges*0.08,1.5)+')';
+}
+['pointerenter','pointerdown','touchstart','mousedown','click','focus'].forEach(ev=>noBtn.addEventListener(ev,dodge,{passive:false}));
+yesBtn.onclick=()=>{
+  document.getElementById('intro').style.display='none';
+  noBtn.style.display='none';
+  document.getElementById('main').hidden=false;
+  window.scrollTo({top:0});
+};
+
+// ====== SETTINGS ======
+// Put Zyad's WhatsApp number here: country code + number, digits only. Egypt example: 201012345678
+const PHONE = "201115210313";
+const YEAR = 2026, MONTH = 10;      // November (0-based month)
+const FIRST_DAY = 14;               // earliest selectable date
+const BUSY_WEEKDAYS = [6, 2];       // Saturday and Tuesday
+// ======================
+
+const WD_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const WD_AR = ["الأحد","الاتنين","التلات","الأربع","الخميس","الجمعة","السبت"];
+const state = {place:null, day:null, hour:null};
+const $ = id => document.getElementById(id);
+
+// Places
+document.querySelectorAll('#places .choice').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('#places .choice').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true'); state.place=b.dataset.v; update();
+  };
+});
+
+// Calendar
+const cal=$('cal');
+["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d=>{const e=document.createElement('div');e.className='dow';e.textContent=d;cal.appendChild(e)});
+const offset=new Date(YEAR,MONTH,1).getDay();
+for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='empty';cal.appendChild(e)}
+const daysIn=new Date(YEAR,MONTH+1,0).getDate();
+for(let d=1;d<=daysIn;d++){
+  const btn=document.createElement('button');
+  btn.className='day'; btn.textContent=d;
+  const wd=new Date(YEAR,MONTH,d).getDay();
+  if(d<FIRST_DAY){btn.disabled=true}
+  btn.onclick=()=>{
+    if(BUSY_WEEKDAYS.includes(wd)){
+      state.day=null; $('dayLabel').textContent='';
+      document.querySelectorAll('.day').forEach(x=>x.classList.remove('selected'));
+      $('busyNote').classList.remove('show'); void $('busyNote').offsetWidth;
+      $('busyNote').classList.add('show');
+      update(); return;
+    }
+    $('busyNote').classList.remove('show');
+    document.querySelectorAll('.day').forEach(x=>x.classList.remove('selected'));
+    btn.classList.add('selected'); state.day=d;
+    $('dayLabel').textContent=WD_EN[wd]+", Nov "+d;
+    update();
+  };
+  cal.appendChild(btn);
+}
+
+// Times
+const hours=[12,13,14,15,16,17,18,19,20,21,22];
+const fmtEN=h=>{const hh=h%12===0?12:h%12;return hh+":00 "+(h<12?"AM":"PM")};
+const periodAR=h=>h<13?"ظهراً":h<18?"عصراً":"مساءً";
+const fmtAR=h=>(h%12===0?12:h%12)+":00 "+periodAR(h);
+hours.forEach(h=>{
+  const b=document.createElement('button');
+  b.className='time'; b.textContent=fmtEN(h);
+  b.onclick=()=>{
+    document.querySelectorAll('.time').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true'); state.hour=h; update();
+  };
+  $('times').appendChild(b);
+});
+
+function update(){
+  const ready=state.place&&state.day&&state.hour!==null;
+  if(!state.place&&!state.day&&state.hour===null){return}
+  const wd=state.day?new Date(YEAR,MONTH,state.day).getDay():null;
+  $('summary').innerHTML=
+    "Place: <b>"+(state.place?(state.place==="cafe"?"Café ☕":"Restaurant 🍽️"):"…")+"</b><br>"+
+    "Day: <b>"+(state.day?WD_EN[wd]+", November "+state.day:"…")+"</b><br>"+
+    "Time: <b>"+(state.hour!==null?fmtEN(state.hour):"…")+"</b>";
+  $('send').disabled=!ready;
+}
+
+// Send to WhatsApp
+$('send').onclick=()=>{
+  const wd=new Date(YEAR,MONTH,state.day).getDay();
+  const place=state.place==="cafe"?"كافيه ☕":"مطعم 🍽️";
+  const msg=
+`من زياد إلى حبيبتي سمسم 🌹💖
+
+شفت إنك وافقتي على خروجتنا وقلبي رقص من الفرحة 😍🥹
+
+تفاصيل الخروجة:
+📍 المكان: ${place}
+📅 اليوم: ${WD_AR[wd]} ${state.day} نوفمبر
+🕐 الساعة: ${fmtAR(state.hour)}
+
+مش قادر أستنى اليوم ده يجي عشان أشوفك وأقعد معاكي وأضحك من قلبي وأحكيلك كل حاجة 🥰✨
+
+بحبك أوي يا سمسم يا أجمل حاجة في حياتي 💕
+زياد ممدوح 🤍`;
+  const clean=msg.replace(/\uFE0F/g,"");
+  window.open("https://api.whatsapp.com/send?phone="+PHONE+"&text="+encodeURIComponent(clean),"_blank");
+  $('thanks').classList.add('show');
+  $('thanks').scrollIntoView({behavior:'smooth'});
+};
+</script>
+</body>
+</html>
