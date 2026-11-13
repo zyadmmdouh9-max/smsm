@@ -227,21 +227,22 @@ function update(){
 // Send to WhatsApp
 $('send').onclick=()=>{
   const wd=new Date(YEAR,MONTH,state.day).getDay();
-  const place=state.place==="cafe"?"كافيه ☕":"مطعم 🍽️";
+  const place=state.place==="cafe"?"Café ☕":"Restaurant 🍽️";
+  const clock=String.fromCodePoint(0x1F550+((state.hour%12)||12)-1);
   const msg=
-`من زياد إلى حبيبتي سمسم 🌹💖
+`From Zyad to My smsm 🌹💖
 
-شفت إنك وافقتي على خروجتنا وقلبي رقص من الفرحة 😍🥹
+I’m really happy you said yes to our date! ❤️
 
-تفاصيل الخروجة:
-📍 المكان: ${place}
-📅 اليوم: ${WD_AR[wd]} ${state.day} نوفمبر
-🕐 الساعة: ${fmtAR(state.hour)}
+Date Details:
+📍 Place: ${place}
+📅 Date: ${WD_EN[wd]}, November ${state.day}
+${clock} Time: ${fmtEN(state.hour)}
 
-مش قادر أستنى اليوم ده يجي عشان أشوفك وأقعد معاكي وأضحك من قلبي وأحكيلك كل حاجة 🥰✨
+Looking forward to seeing you, spending some quality time together, and making more beautiful memories. 🥰
 
-بحبك أوي يا سمسم يا أجمل حاجة في حياتي 💕
-زياد ممدوح 🤍`;
+Can't wait to see you, smsm! ❤️
+Zyad Mamdouh 🤍`;
   const clean=msg.replace(/\uFE0F/g,"");
   window.open("https://api.whatsapp.com/send?phone="+PHONE+"&text="+encodeURIComponent(clean),"_blank");
   $('thanks').classList.add('show');
